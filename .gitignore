@@ -1,0 +1,17 @@
+node_modules
+dist
+.env.local
+.env
+*.log
+.DS_Store
+.vscode
+.idea
+.next
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+ARCHITECTURE_DEEP_DIVE.md
+DEPLOY.md
+INDEX.md
+MANIFEST.md
+QUICK_REFERENCE.md
