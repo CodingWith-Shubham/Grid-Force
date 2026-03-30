@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { Grid } from './components/Grid';
 import { Leaderboard } from './components/Leaderboard';
 import { Stats } from './components/Stats';
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
+import ActivityPanel from './components/ActivityPanel';
 import { useSocket } from './hooks/useSocket';
 import { useKeepAlive } from './hooks/useKeepAlive';
 import { generateUserId, generateUserColor } from './utils/colors';
@@ -20,6 +23,7 @@ function App() {
     totalTilesClaimed: 0
   });
   const [connectionStatus, setConnectionStatus] = useState('connecting');
+  const [activities, setActivities] = useState([]);
   const { on, off, emit, isConnected } = useSocket();
 
   // Keep backend alive by pinging health endpoint every 10 minutes
@@ -54,6 +58,19 @@ function App() {
         onlineUsers: data.users.length,
         totalTilesClaimed: data.totalTilesClaimed
       });
+      
+      // Track activity
+      if (data.lastActivity) {
+        setActivities(prev => [
+          {
+            type: 'claim',
+            message: 'claimed a territory',
+            user: data.lastActivity.userId,
+            timestamp: Date.now()
+          },
+          ...prev
+        ].slice(0, 20));
+      }
     };
 
     const handleConnect = () => {
@@ -95,53 +112,60 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Real-Time Collaborative Grid
-              </h1>
-              <p className="text-gray-600 text-sm mt-1">
-                Click blocks to claim them. Multiple players can interact simultaneously.
-              </p>
+    <div className="min-h-screen bg-gradient-to-b from-gaming-dark via-gaming-darker to-gaming-dark overflow-x-hidden">
+      {/* Navbar */}
+      <Navbar
+        gridSize={GRID_SIZE}
+        totalBlocks={GRID_SIZE * GRID_SIZE}
+        claimedBlocks={stats.totalTilesClaimed}
+      />
+
+      {/* Hero Section */}
+      <Hero />
+
+      {/* Main Content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-16">
+        {/* User Info & Status Bar */}
+        {userId && userColor && (
+          <div className="mb-8 glass rounded-lg p-4 border border-gaming-border flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-4">
+              <div
+                className="w-6 h-6 rounded-full shadow-lg"
+                style={{
+                  backgroundColor: userColor,
+                  boxShadow: `0 0 15px ${userColor}`
+                }}
+              />
+              <div>
+                <p className="text-xs uppercase tracking-widest text-gaming-fire font-gaming">Your Identity</p>
+                <p className="text-sm font-bold text-gaming-cyan font-gaming">{userId.substring(0, 16)}...</p>
+              </div>
             </div>
 
             {/* Connection Status */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <div
-                className={`w-3 h-3 rounded-full ${
+                className={`w-2.5 h-2.5 rounded-full ${
                   connectionStatus === 'connected'
-                    ? 'bg-green-500'
+                    ? 'bg-gaming-neon animate-pulse'
                     : connectionStatus === 'connecting'
-                      ? 'bg-yellow-500'
-                      : 'bg-red-500'
+                      ? 'bg-gaming-fireAlt animate-pulse'
+                      : 'bg-gaming-red'
                 }`}
               />
-              <span className="text-sm font-medium text-gray-700 capitalize">
-                {connectionStatus}
+              <span className="text-sm font-bold uppercase tracking-widest text-gaming-fire font-gaming">
+                {connectionStatus === 'connected'
+                  ? 'Connected'
+                  : connectionStatus === 'connecting'
+                    ? 'Connecting...'
+                    : 'Disconnected'}
               </span>
             </div>
           </div>
+        )}
 
-          {/* Your Info */}
-          {userId && userColor && (
-            <div className="bg-white border border-gray-200 rounded-lg p-3 flex items-center gap-3">
-              <div
-                className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: userColor }}
-              />
-              <span className="text-sm font-medium text-gray-700">
-                Your ID: {userId.substring(0, 20)}...
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Stats */}
-        <div className="mb-6">
+        {/* Stats Section */}
+        <div className="mb-8">
           <Stats
             onlineUsers={stats.onlineUsers}
             totalTilesClaimed={stats.totalTilesClaimed}
@@ -149,11 +173,11 @@ function App() {
           />
         </div>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Grid */}
+        {/* Main Grid Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          {/* Grid Container - 3 columns */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-96 flex items-center justify-center">
+            <div className="glass rounded-lg border border-gaming-border overflow-hidden" style={{ height: '600px' }}>
               {gridState.length > 0 ? (
                 <Grid
                   gridState={gridState}
@@ -164,25 +188,35 @@ function App() {
                   scale={1}
                 />
               ) : (
-                <div className="text-center text-gray-500">
-                  <p className="font-medium">Loading grid...</p>
-                  <p className="text-sm mt-1">
-                    {connectionStatus === 'connected'
-                      ? 'Syncing with server...'
-                      : `Status: ${connectionStatus}`}
-                  </p>
+                <div className="h-full flex items-center justify-center text-center">
+                  <div>
+                    <p className="text-gaming-fire font-gaming text-sm uppercase tracking-widest mb-2">Loading Arena...</p>
+                    <p className="text-gaming-cyan text-xs">
+                      {connectionStatus === 'connected'
+                        ? 'Syncing battlefield...'
+                        : `Status: ${connectionStatus}`}
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <Leaderboard
-              users={users}
-              currentUserId={userId}
-              userColor={userColor}
-            />
+          {/* Sidebar - 2 columns */}
+          <div className="lg:col-span-2 flex flex-col gap-6">
+            {/* Leaderboard */}
+            <div className="flex-1">
+              <Leaderboard
+                users={users}
+                currentUserId={userId}
+                userColor={userColor}
+              />
+            </div>
+
+            {/* Activity Panel */}
+            <div className="flex-1 max-h-64">
+              <ActivityPanel activities={activities} />
+            </div>
           </div>
         </div>
       </div>
