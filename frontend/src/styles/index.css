@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo:wght@400;700;800&family=Rajdhani:wght@400;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,49 +8,179 @@
   box-sizing: border-box;
 }
 
+html {
+  background: linear-gradient(135deg, #050709 0%, #0a0e27 50%, #0f1419 100%);
+  background-attachment: fixed;
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Rajdhani', 'Segoe UI', 'Roboto', monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f9fafb;
+  background-color: transparent;
+  color: #e0e0e0;
+  overflow-x: hidden;
 }
 
+/* Glass morphism effect */
+.glass {
+  background: rgba(15, 20, 25, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 107, 53, 0.2);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Grid container */
 .grid-container {
   @apply flex flex-col gap-4 w-full h-full;
 }
 
+/* Grid block base styles */
 .grid-block {
-  @apply w-full h-full flex items-center justify-center rounded transition-all duration-200 cursor-pointer;
+  @apply w-full h-full flex items-center justify-center rounded transition-all duration-300 cursor-pointer relative overflow-hidden;
+  background: rgba(15, 20, 25, 0.6);
+  border: 2px solid rgba(255, 107, 53, 0.3);
+  box-shadow: inset 0 0 10px rgba(255, 107, 53, 0.1);
 }
 
-.grid-block:hover {
-  @apply transform scale-95;
+.grid-block::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(255, 107, 53, 0.1), transparent);
+  pointer-events: none;
 }
 
+/* Unclaimed block */
 .grid-block.unclaimed {
-  @apply bg-white border-2 border-gray-200;
+  @apply border-2 hover:border-orange-500;
+  border-color: rgba(255, 107, 53, 0.3);
+  transition: all 0.3s ease;
 }
 
 .grid-block.unclaimed:hover {
-  @apply bg-gray-100 border-gray-300;
+  @apply transform scale-105;
+  border-color: rgba(255, 107, 53, 0.8);
+  box-shadow: 0 0 20px rgba(255, 107, 53, 0.6), inset 0 0 20px rgba(255, 107, 53, 0.2);
 }
 
+/* Claimed block */
+.grid-block.claimed {
+  border-color: rgba(255, 107, 53, 0.8);
+  box-shadow: 0 0 15px rgba(255, 107, 53, 0.5), inset 0 0 10px rgba(255, 107, 53, 0.15);
+  animation: glow 2s ease-in-out infinite;
+}
+
+.grid-block.claimed:hover {
+  @apply transform scale-110;
+  box-shadow: 0 0 25px rgba(255, 107, 53, 0.8), inset 0 0 15px rgba(255, 107, 53, 0.2);
+}
+
+/* Leaderboard */
 .leaderboard {
-  @apply bg-white rounded-lg shadow-sm border border-gray-200;
+  @apply rounded-lg border backdrop-blur;
+  background: rgba(15, 20, 25, 0.8);
+  border-color: rgba(255, 107, 53, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(255, 107, 53, 0.05);
 }
 
+.leaderboard-item {
+  @apply px-4 py-3 border-b transition-all duration-200 hover:bg-opacity-50;
+  border-color: rgba(255, 107, 53, 0.1);
+}
+
+.leaderboard-item:hover {
+  background: rgba(255, 107, 53, 0.05);
+  box-shadow: inset 0 0 10px rgba(255, 107, 53, 0.1);
+}
+
+.leaderboard-item.top-1 {
+  background: rgba(255, 215, 0, 0.1);
+  border-color: rgba(255, 215, 0, 0.3);
+}
+
+.leaderboard-item.top-2 {
+  background: rgba(192, 192, 192, 0.08);
+  border-color: rgba(192, 192, 192, 0.2);
+}
+
+.leaderboard-item.top-3 {
+  background: rgba(205, 127, 50, 0.08);
+  border-color: rgba(205, 127, 50, 0.2);
+}
+
+/* Stats */
 .stats {
-  @apply flex gap-6 justify-between items-center;
+  @apply flex gap-6 justify-between items-center flex-wrap;
 }
 
 .stat-item {
-  @apply flex flex-col items-center justify-center;
+  @apply flex flex-col items-center justify-center p-4 rounded backdrop-blur;
+  background: rgba(15, 20, 25, 0.8);
+  border: 1px solid rgba(255, 107, 53, 0.2);
+  min-width: 120px;
+  animation: fadeIn 0.8s ease-out;
 }
 
+.stat-label {
+  @apply text-xs uppercase tracking-widest;
+  color: rgba(255, 107, 53, 0.7);
+  font-family: 'Orbitron', monospace;
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  @apply text-2xl font-bold mt-2;
+  color: #ff6b35;
+  text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+  font-family: 'Orbitron', monospace;
+}
+
+/* Cooldown overlay */
 .cooldown-overlay {
-  @apply absolute inset-0 flex items-center justify-center rounded bg-black bg-opacity-30;
+  @apply absolute inset-0 flex items-center justify-center rounded;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  color: #ff6b35;
+  font-family: 'Orbitron', monospace;
+  font-weight: bold;
+  font-size: 24px;
+  text-shadow: 0 0 10px rgba(255, 107, 53, 0.8);
+}
+
+/* Neon text effect */
+.neon-text {
+  color: #ff6b35;
+  text-shadow: 0 0 10px rgba(255, 107, 53, 0.8), 0 0 20px rgba(255, 107, 53, 0.4);
+  font-family: 'Orbitron', monospace;
+  font-weight: bold;
+}
+
+/* Gaming borders */
+.gaming-border {
+  border: 2px solid rgba(255, 107, 53, 0.5);
+  box-shadow: inset 0 0 10px rgba(255, 107, 53, 0.1), 0 0 15px rgba(255, 107, 53, 0.3);
+}
+
+/* Scroll bar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 20, 25, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 107, 53, 0.6);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 107, 53, 0.8);
 }

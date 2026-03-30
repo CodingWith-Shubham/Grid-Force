@@ -35,17 +35,32 @@ export const Grid = ({
 
   return (
     <div
-      className="flex-1 overflow-auto bg-gray-50 rounded-lg border border-gray-200"
+      className="flex-1 overflow-auto rounded-lg border gaming-border bg-gaming-dark relative"
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       style={{
-        cursor: isDragging ? 'grabbing' : 'grab'
+        cursor: isDragging ? 'grabbing' : 'grab',
+        background: 'linear-gradient(135deg, rgba(10, 14, 39, 0.8) 0%, rgba(15, 20, 25, 0.8) 100%)',
+        boxShadow: 'inset 0 0 30px rgba(255, 107, 53, 0.1), 0 0 30px rgba(255, 107, 53, 0.2)'
       }}
     >
+      {/* Grid background pattern */}
+      <div 
+        className="absolute inset-0 opacity-10 pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(90deg, rgba(255, 107, 53, 0.3) 1px, transparent 1px),
+            linear-gradient(0deg, rgba(255, 107, 53, 0.3) 1px, transparent 1px)
+          `,
+          backgroundSize: `${tileSize + 2}px ${tileSize + 2}px`,
+          backgroundPosition: `${pan.x}px ${pan.y}px`
+        }}
+      ></div>
+
       <div
-        className="inline-grid gap-0.5 p-4"
+        className="inline-grid gap-0.5 p-4 relative z-10"
         style={{
           gridTemplateColumns: `repeat(${gridSize}, ${tileSize}px)`,
           transform: `translate(${pan.x}px, ${pan.y}px)`,
